@@ -31,7 +31,7 @@ public class Tile {
 	public void toggleFlag() {
 		if (this.state.equals(TileState.HIDDEN))
 			this.setState(TileState.FLAGGED);
-		else
+		else if (this.state.equals(TileState.FLAGGED))
 			this.setState(TileState.HIDDEN);
 	}
 

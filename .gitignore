@@ -1,7 +1,5 @@
 /bin/
 /target/
-/res/
-res
 .project
 .settings
 .DS_Store

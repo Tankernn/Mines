@@ -1,5 +1,12 @@
-/bin/
-/target/
+.settings/
+.classpath
 .project
-.settings
+
+tmp/
+*.tmp
+*.bak
+*.swp
+
+bin/
+target/
 .DS_Store

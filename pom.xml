@@ -24,6 +24,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}-${project.version}.${build.number}</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -67,10 +68,18 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>res</directory>
+				<excludes>
+				</excludes>
+			</resource>
+		</resources>
 	</build>
 	
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<build.number>SNAPSHOT</build.number>
 	</properties>
 </project>

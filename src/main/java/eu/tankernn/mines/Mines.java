@@ -26,22 +26,32 @@ public class Mines extends TankernnGame {
 	public static String GAME_NAME = "Minesweeper";
 	public static Pos[] DEFAULT_PATTERN = { new Pos(0, 1), new Pos(0, -1), new Pos(1, 0), new Pos(1, 1), new Pos(1, -1),
 			new Pos(-1, 0), new Pos(-1, -1), new Pos(-1, 1) };
+	public static Settings DEFAULT_SETTINGS = new Settings(DEFAULT_PATTERN, 9, 9, 20);
 
+	// Utility
 	private Random rand = new Random();
 	private DecimalFormat format = new DecimalFormat("0.000 sec");
 	private GuiRenderer renderer;
-	private PatternEditor editor;
+	private SettingsEditor editor;
 
+	// Graphics
 	private Texture hidden, exploded, flagged;
 	private Texture[] checked;
 	private GUIText timeText;
-	private long startTime;
-
-	private int boardWidth = 20, boardHeight = 20;
 	private int tileWidth, tileHeight;
+	
+	/**
+	 * Next game settings.
+	 */
+	private Settings nextSettings;
+	/**
+	 * Current game settings.
+	 */
+	private Settings settings;
+
+	// Game state
+	private long startTime;
 	private Tile[][] tiles;
-	private Pos[] pattern = DEFAULT_PATTERN;
-	private int totalMines = 200;
 	private int hiddenTiles;
 	private boolean running = false;
 	private boolean justClicked = false;
@@ -49,9 +59,6 @@ public class Mines extends TankernnGame {
 	public Mines(String name) {
 		super(name);
 		renderer = new GuiRenderer(loader);
-
-		tileWidth = Display.getWidth() / boardWidth;
-		tileHeight = Display.getHeight() / boardHeight;
 
 		try {
 			hidden = loader.loadTexture("hidden.png");
@@ -62,38 +69,58 @@ public class Mines extends TankernnGame {
 			flagged = loader.loadTexture("flagged.png");
 			FontType font = new FontType(loader.loadTexture("arial.png"), new InternalFile("arial.fnt"));
 			timeText = new GUIText(format.format(0), 1f, font, new Vector2f(0f, 0f), 100, false);
-			GUIText helpText = new GUIText("R - reset, \n E - edit pattern", 1f, font, new Vector2f(0.8f, 0f), 0.15f, false);
+			GUIText helpText = new GUIText("R - reset, E - edit settings", 1f, font, new Vector2f(0.8f, 0f), 0.15f,
+					false);
 			textMaster.loadText(timeText);
 			textMaster.loadText(helpText);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
-		startGame(DEFAULT_PATTERN);
-	}
-
-	public void startGame(Pos[] pattern) {
-		this.pattern = pattern;
+		
+		setSettings(DEFAULT_SETTINGS);
 		startGame();
 	}
 
+	public void setSettings(Settings settings) {
+		this.nextSettings = settings;
+	}
+
+	/**
+	 * Starts game with next settings.
+	 */
 	private void startGame() {
+		if (!nextSettings.equals(settings)) {
+			this.settings = nextSettings;
+			updateBoardSize();
+		}
 		startTime = Sys.getTime();
-		hiddenTiles = boardHeight * boardWidth;
-		List<Pos> minePositions = new ArrayList<Pos>();
-		for (int i = 0; i < totalMines; i++) {
-			minePositions.add(new Pos(rand.nextInt(boardWidth), rand.nextInt(boardHeight)));
+		hiddenTiles = settings.area;
+		tiles = generateBoard(settings.boardWidth, settings.boardHeight, settings.mines);
+		running = true;
+	}
+
+	private Tile[][] generateBoard(int width, int height, int mines) {
+		if (width * height < mines) {
+			throw new IllegalArgumentException("The mines will not fit on the board.");
 		}
 
-		tiles = new Tile[boardWidth][boardHeight];
+		List<Pos> minePositions = new ArrayList<Pos>();
+		for (int i = 0; i < mines; i++) {
+			Pos p;
+			do {
+				p = new Pos(rand.nextInt(width), rand.nextInt(height));
+			} while (minePositions.contains(p));
+			minePositions.add(p);
+		}
 
-		for (int y = 0; y < boardHeight; y++) {
-			for (int x = 0; x < boardWidth; x++) {
+		tiles = new Tile[width][height];
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				tiles[x][y] = new Tile(minePositions.contains(new Pos(x, y)), new Pos(x, y));
 			}
 		}
-
-		running = true;
+		return tiles;
 	}
 
 	public void check(Tile tile) {
@@ -101,13 +128,13 @@ public class Mines extends TankernnGame {
 			if (tile.isMine)
 				lose();
 			else
-				calculateMinesAround(tile);
+				calculateMinesAround(tile, settings.pattern);
 	}
 
-	public void calculateMinesAround(Tile tile) {
+	public void calculateMinesAround(Tile tile, Pos[] pattern) {
 		hiddenTiles--;
 
-		int count = 0;
+		int minesAround = 0;
 		List<Tile> testTiles = new ArrayList<Tile>();
 
 		for (int i = 0; i < pattern.length; i++) {
@@ -120,18 +147,20 @@ public class Mines extends TankernnGame {
 
 		for (Tile testTile : testTiles)
 			if (testTile.isMine)
-				count++;
+				minesAround++;
 
-		tile.setMinesAround(count);
-
-		if (count == 0)
+		tile.setMinesAround(minesAround);
+		
+		// Keep checking if there are no mines around
+		if (minesAround == 0)
 			for (Tile testTile : testTiles)
 				if (testTile.getState().equals(Tile.TileState.HIDDEN))
-					calculateMinesAround(testTile);
+					calculateMinesAround(testTile, pattern);
 	}
 
 	private void lose() {
 		running = false;
+		// Expose all mines
 		for (Tile[] tArr : tiles)
 			for (Tile t : tArr)
 				if (t.isMine)
@@ -178,15 +207,16 @@ public class Mines extends TankernnGame {
 			} else
 				justClicked = false;
 		}
-
+		
+		// Handle keyboard
 		if (running)
 			timeText.setText(format.format(((float) (Sys.getTime() - startTime)) / Sys.getTimerResolution()));
 		else if (Keyboard.isKeyDown(Keyboard.KEY_R))
 			startGame();
 		else if (Keyboard.isKeyDown(Keyboard.KEY_E) && (editor == null || !editor.isShowing()))
-			editor = new PatternEditor(this);
+			editor = new SettingsEditor(this);
 
-		if (hiddenTiles == totalMines)
+		if (hiddenTiles == settings.mines)
 			win();
 
 		super.update();
@@ -196,11 +226,13 @@ public class Mines extends TankernnGame {
 	public void render() {
 		List<GuiTexture> toRender = new ArrayList<GuiTexture>();
 
-		for (int y = 0; y < boardHeight; y++) {
-			for (int x = 0; x < boardWidth; x++) {
+		for (int y = 0; y < settings.boardHeight; y++) {
+			for (int x = 0; x < settings.boardWidth; x++) {
 				Tile t = tiles[x][y];
+				// Text output
 				System.out.print(t.getState().equals(TileState.CHECKED) ? Integer.toString(t.getMinesAround())
 						: t.getState().appearance);
+				// OpenGL output
 				Texture tex;
 				switch (t.getState()) {
 				case CHECKED:
@@ -219,7 +251,7 @@ public class Mines extends TankernnGame {
 					tex = hidden;
 					break;
 				}
-				Vector2f scale = new Vector2f(1f / boardWidth, 1f / boardHeight);
+				Vector2f scale = new Vector2f(1f / settings.boardWidth, 1f / settings.boardHeight);
 				toRender.add(new GuiTexture(tex,
 						new Vector2f(2 * scale.x * t.pos.x + scale.x - 1, 2 * scale.y * t.pos.y + scale.y - 1), scale));
 			}
@@ -235,6 +267,11 @@ public class Mines extends TankernnGame {
 	@Override
 	public void cleanUp() {
 		super.cleanUp();
+	}
+
+	private void updateBoardSize() {
+		tileWidth = Display.getWidth() / settings.boardWidth;
+		tileHeight = Display.getHeight() / settings.boardHeight;
 	}
 
 	public static void main(String[] args) {

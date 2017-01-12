@@ -11,15 +11,18 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.border.EmptyBorder;
 
 @SuppressWarnings("serial")
-public class PatternEditor extends JFrame {
+public class SettingsEditor extends JFrame {
 
 	private JPanel contentPane;
 	private int radius = 3, size = radius * 2 + 1;
 	private Mines gameInstance;
+	private JSpinner minesSpinner = new JSpinner(), sizeSpinner = new JSpinner();
 
 	/**
 	 * Launch the application.
@@ -28,7 +31,7 @@ public class PatternEditor extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					PatternEditor frame = new PatternEditor(null);
+					SettingsEditor frame = new SettingsEditor(null);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,13 +43,21 @@ public class PatternEditor extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public PatternEditor(Mines instance) {
+	public SettingsEditor(Mines instance) {
 		gameInstance = instance;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+
+		JPanel options = new JPanel();
+		options.setLayout(new GridLayout(2, 2));
+
+		options.add(new JLabel("Board size: "));
+		options.add(sizeSpinner);
+		options.add(new JLabel("Number of mines: "));
+		options.add(minesSpinner);
 
 		JPanel grid = new JPanel();
 		grid.setLayout(new GridLayout(size, size));
@@ -76,17 +87,20 @@ public class PatternEditor extends JFrame {
 					}
 				}
 				if (gameInstance != null) {
-					gameInstance.startGame(pattern.toArray(new Pos[pattern.size()]));
+					gameInstance.setSettings(new Settings(pattern.toArray(new Pos[pattern.size()]),
+							(int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
 					dispose();
 				}
 			}
 		});
 
+		contentPane.add(options, BorderLayout.NORTH);
 		contentPane.add(grid, BorderLayout.CENTER);
 		contentPane.add(save, BorderLayout.SOUTH);
 
 		pack();
 		setTitle("Minesweeper pattern editor");
 		setVisible(true);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 }

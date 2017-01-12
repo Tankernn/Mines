@@ -23,8 +23,8 @@ import eu.tankernn.gameEngine.util.InternalFile;
 import eu.tankernn.mines.Tile.TileState;
 
 public class Mines extends TankernnGame {
-	public static String GAME_NAME = "Minesweeper";
-	public static Pos[] DEFAULT_PATTERN = { new Pos(0, 1), new Pos(0, -1), new Pos(1, 0), new Pos(1, 1), new Pos(1, -1),
+	public static final String GAME_NAME = "Minesweeper";
+	public static final Pos[] DEFAULT_PATTERN = { new Pos(0, 1), new Pos(0, -1), new Pos(1, 0), new Pos(1, 1), new Pos(1, -1),
 			new Pos(-1, 0), new Pos(-1, -1), new Pos(-1, 1) };
 	public static Settings DEFAULT_SETTINGS = new Settings(DEFAULT_PATTERN, 9, 9, 20);
 

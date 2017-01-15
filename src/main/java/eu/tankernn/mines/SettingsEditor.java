@@ -22,7 +22,9 @@ public class SettingsEditor extends JFrame {
 	private JPanel contentPane;
 	private int radius = 3, size = radius * 2 + 1;
 	private Mines gameInstance;
-	private JSpinner minesSpinner = new JSpinner(), sizeSpinner = new JSpinner();
+	private JSpinner minesSpinner = new JSpinner(),
+			sizeSpinner = new JSpinner();
+	JCheckBox[][] boxes;
 
 	/**
 	 * Launch the application.
@@ -62,7 +64,7 @@ public class SettingsEditor extends JFrame {
 		JPanel grid = new JPanel();
 		grid.setLayout(new GridLayout(size, size));
 
-		JCheckBox[][] boxes = new JCheckBox[size][size];
+		boxes = new JCheckBox[size][size];
 
 		for (int x = 0; x < boxes.length; x++) {
 			for (int y = 0; y < boxes[x].length; y++) {
@@ -71,6 +73,8 @@ public class SettingsEditor extends JFrame {
 				grid.add(box);
 			}
 		}
+
+		importSettings(instance.getSettings());
 
 		boxes[radius][radius].setEnabled(false);
 
@@ -87,8 +91,7 @@ public class SettingsEditor extends JFrame {
 					}
 				}
 				if (gameInstance != null) {
-					gameInstance.setSettings(new Settings(pattern.toArray(new Pos[pattern.size()]),
-							(int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
+					gameInstance.setSettings(new Settings(pattern.toArray(new Pos[pattern.size()]), (int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
 					dispose();
 				}
 			}
@@ -102,5 +105,13 @@ public class SettingsEditor extends JFrame {
 		setTitle("Minesweeper pattern editor");
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	}
+
+	private void importSettings(Settings settings) {
+		sizeSpinner.setValue((int) Math.sqrt(settings.area));
+		minesSpinner.setValue(settings.mines);
+
+		for (Pos pos : settings.pattern)
+			boxes[pos.x +radius][pos.y + radius].setSelected(true);
 	}
 }

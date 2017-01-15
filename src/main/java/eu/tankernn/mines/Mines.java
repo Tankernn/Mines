@@ -24,9 +24,9 @@ import eu.tankernn.mines.Tile.TileState;
 
 public class Mines extends TankernnGame {
 	public static final String GAME_NAME = "Minesweeper";
-	public static final Pos[] DEFAULT_PATTERN = { new Pos(0, 1), new Pos(0, -1), new Pos(1, 0), new Pos(1, 1), new Pos(1, -1),
-			new Pos(-1, 0), new Pos(-1, -1), new Pos(-1, 1) };
-	public static Settings DEFAULT_SETTINGS = new Settings(DEFAULT_PATTERN, 9, 9, 20);
+	public static final Pos[] DEFAULT_PATTERN = { new Pos(0, 1), new Pos(0, -1), new Pos(1, 0), new Pos(1, 1), new Pos(1, -1), new Pos(-1, 0), new Pos(-1, -1), new Pos(-1, 1) };
+	public static final Settings DEFAULT_SETTINGS = new Settings(DEFAULT_PATTERN, 9, 9, 20);
+	public static final boolean DEBUG = false;
 
 	// Utility
 	private Random rand = new Random();
@@ -39,7 +39,7 @@ public class Mines extends TankernnGame {
 	private Texture[] checked;
 	private GUIText timeText;
 	private int tileWidth, tileHeight;
-	
+
 	/**
 	 * Next game settings.
 	 */
@@ -69,14 +69,13 @@ public class Mines extends TankernnGame {
 			flagged = loader.loadTexture("flagged.png");
 			FontType font = new FontType(loader.loadTexture("arial.png"), new InternalFile("arial.fnt"));
 			timeText = new GUIText(format.format(0), 1f, font, new Vector2f(0f, 0f), 100, false);
-			GUIText helpText = new GUIText("R - reset, E - edit settings", 1f, font, new Vector2f(0.8f, 0f), 0.15f,
-					false);
+			GUIText helpText = new GUIText("R - reset, E - edit settings", 1f, font, new Vector2f(0.8f, 0f), 0.15f, false);
 			textMaster.loadText(timeText);
 			textMaster.loadText(helpText);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		setSettings(DEFAULT_SETTINGS);
 		startGame();
 	}
@@ -150,7 +149,7 @@ public class Mines extends TankernnGame {
 				minesAround++;
 
 		tile.setMinesAround(minesAround);
-		
+
 		// Keep checking if there are no mines around
 		if (minesAround == 0)
 			for (Tile testTile : testTiles)
@@ -207,13 +206,14 @@ public class Mines extends TankernnGame {
 			} else
 				justClicked = false;
 		}
-		
+
 		// Handle keyboard
 		if (running)
 			timeText.setText(format.format(((float) (Sys.getTime() - startTime)) / Sys.getTimerResolution()));
 		else if (Keyboard.isKeyDown(Keyboard.KEY_R))
 			startGame();
-		else if (Keyboard.isKeyDown(Keyboard.KEY_E) && (editor == null || !editor.isShowing()))
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_E) && (editor == null || !editor.isShowing()))
 			editor = new SettingsEditor(this);
 
 		if (hiddenTiles == settings.mines)
@@ -230,34 +230,35 @@ public class Mines extends TankernnGame {
 			for (int x = 0; x < settings.boardWidth; x++) {
 				Tile t = tiles[x][y];
 				// Text output
-				System.out.print(t.getState().equals(TileState.CHECKED) ? Integer.toString(t.getMinesAround())
-						: t.getState().appearance);
+				if (DEBUG)
+					System.out.print(t.getState().equals(TileState.CHECKED) ? Integer.toString(t.getMinesAround()) : t.getState().appearance);
 				// OpenGL output
 				Texture tex;
 				switch (t.getState()) {
-				case CHECKED:
-					tex = checked[t.getMinesAround()];
-					break;
-				case EXPLODED:
-					tex = exploded;
-					break;
-				case FLAGGED:
-					tex = flagged;
-					break;
-				case HIDDEN:
-					tex = hidden;
-					break;
-				default:
-					tex = hidden;
-					break;
+					case CHECKED:
+						tex = checked[t.getMinesAround()];
+						break;
+					case EXPLODED:
+						tex = exploded;
+						break;
+					case FLAGGED:
+						tex = flagged;
+						break;
+					case HIDDEN:
+						tex = hidden;
+						break;
+					default:
+						tex = hidden;
+						break;
 				}
 				Vector2f scale = new Vector2f(1f / settings.boardWidth, 1f / settings.boardHeight);
-				toRender.add(new GuiTexture(tex,
-						new Vector2f(2 * scale.x * t.pos.x + scale.x - 1, 2 * scale.y * t.pos.y + scale.y - 1), scale));
+				toRender.add(new GuiTexture(tex, new Vector2f(2 * scale.x * t.pos.x + scale.x - 1, 2 * scale.y * t.pos.y + scale.y - 1), scale));
 			}
-			System.out.println();
+			if (DEBUG)
+				System.out.println();
 		}
-		System.out.println("-------------------");
+		if (DEBUG)
+			System.out.println("-------------------");
 
 		renderer.render(toRender);
 
@@ -267,6 +268,8 @@ public class Mines extends TankernnGame {
 	@Override
 	public void cleanUp() {
 		super.cleanUp();
+		if (editor != null)
+			editor.dispose();
 	}
 
 	private void updateBoardSize() {
@@ -277,5 +280,9 @@ public class Mines extends TankernnGame {
 	public static void main(String[] args) {
 		GameLauncher.init(GAME_NAME, 800, 800);
 		GameLauncher.launch(new Mines(GAME_NAME));
+	}
+
+	public Settings getSettings() {
+		return settings;
 	}
 }

@@ -7,13 +7,24 @@ public class Pos {
 		this.x = x;
 		this.y = y;
 	}
+	
+	@Override
+	public int hashCode() {
+		return x + y;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == this) return true;
 		if (obj instanceof Pos) {
 			Pos other = (Pos) obj;
 			return other.x == this.x && other.y == this.y;
 		} else
 			return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + x + ", " + y + ")";
 	}
 }

@@ -1,12 +1,9 @@
 package eu.tankernn.mines;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,22 +20,6 @@ public class SettingsEditor extends JFrame {
 	private int radius = 3, size = radius * 2 + 1;
 	private Mines gameInstance;
 	private JSpinner minesSpinner = new JSpinner(), sizeSpinner = new JSpinner();
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					SettingsEditor frame = new SettingsEditor(null);
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -75,22 +56,14 @@ public class SettingsEditor extends JFrame {
 		boxes[radius][radius].setEnabled(false);
 
 		JButton save = new JButton("Save");
-		save.addActionListener(new ActionListener() {
+		save.addActionListener(e -> {
+			List<Pos> pattern = Mines.allPositions(size, size).filter(p -> boxes[p.x][p.y].isSelected())
+					.collect(Collectors.toList());
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				List<Pos> pattern = new ArrayList<Pos>();
-				for (int x = 0; x < boxes.length; x++) {
-					for (int y = 0; y < boxes[x].length; y++) {
-						if (boxes[x][y].isSelected())
-							pattern.add(new Pos(x - radius, y - radius));
-					}
-				}
-				if (gameInstance != null) {
-					gameInstance.setSettings(new Settings(pattern.toArray(new Pos[pattern.size()]),
-							(int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
-					dispose();
-				}
+			if (gameInstance != null) {
+				gameInstance.setSettings(new Settings(pattern, (int) sizeSpinner.getValue(),
+						(int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
+				dispose();
 			}
 		});
 

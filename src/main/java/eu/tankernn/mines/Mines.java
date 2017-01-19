@@ -31,7 +31,8 @@ public class Mines extends TankernnGame {
 	public static final String GAME_NAME = "Minesweeper";
 	public static final Pos[] DEFAULT_PATTERN = { new Pos(0, 1), new Pos(0, -1), new Pos(1, 0), new Pos(1, 1),
 			new Pos(1, -1), new Pos(-1, 0), new Pos(-1, -1), new Pos(-1, 1) };
-	public static Settings DEFAULT_SETTINGS = new Settings(Arrays.asList(DEFAULT_PATTERN), 9, 9, 10);
+	public static final Settings DEFAULT_SETTINGS = new Settings(Arrays.asList(DEFAULT_PATTERN), 9, 9, 10);
+	public static final boolean DEBUG = false;
 
 	// Utility
 	private DecimalFormat format = new DecimalFormat("0.000 sec");
@@ -210,6 +211,7 @@ public class Mines extends TankernnGame {
 			Vector2f scale = new Vector2f(1f / settings.boardWidth, 1f / settings.boardHeight);
 			toRender.add(new GuiTexture(tex,
 					new Vector2f(2 * scale.x * t.pos.x + scale.x - 1, 2 * scale.y * t.pos.y + scale.y - 1), scale));
+
 		}
 
 		renderer.render(toRender);
@@ -221,6 +223,8 @@ public class Mines extends TankernnGame {
 	@Override
 	public void cleanUp() {
 		super.cleanUp();
+		if (editor != null)
+			editor.dispose();
 	}
 
 	public static Stream<Pos> allPositions(int width, int height) {
@@ -245,5 +249,9 @@ public class Mines extends TankernnGame {
 	public static void main(String[] args) {
 		GameLauncher.init(GAME_NAME, 800, 800);
 		GameLauncher.launch(new Mines(GAME_NAME));
+	}
+
+	public Settings getSettings() {
+		return settings;
 	}
 }

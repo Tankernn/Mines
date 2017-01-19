@@ -1,5 +1,6 @@
 package eu.tankernn.mines;
 
+import java.awt.EventQueue;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -178,7 +179,10 @@ public class Mines extends TankernnGame {
 		else if (Keyboard.isKeyDown(Keyboard.KEY_R))
 			startGame();
 		if (Keyboard.isKeyDown(Keyboard.KEY_E) && (editor == null || !editor.isShowing()))
-			editor = new SettingsEditor(this);
+			EventQueue.invokeLater(() -> {
+				editor = new SettingsEditor(this);
+			});
+			
 
 		if (hiddenTiles == settings.mines)
 			win();
@@ -215,9 +219,7 @@ public class Mines extends TankernnGame {
 		}
 
 		renderer.render(toRender);
-
 		super.render();
-
 	}
 
 	@Override

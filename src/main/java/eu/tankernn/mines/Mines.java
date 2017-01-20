@@ -75,7 +75,7 @@ public class Mines extends TankernnGame {
 			flagged = loader.loadTexture("flagged.png");
 			FontType font = new FontType(loader.loadTexture("arial.png"), new InternalFile("arial.fnt"));
 			timeText = new GUIText(format.format(0), 1f, font, new Vector2f(0f, 0f), 100, false);
-			GUIText helpText = new GUIText("R - reset, E - edit settings", 1f, font, new Vector2f(0.8f, 0f), 0.15f,
+			GUIText helpText = new GUIText("Press R to reset board", 1f, font, new Vector2f(0.8f, 0f), 0.15f,
 					false);
 			textMaster.loadText(timeText);
 			textMaster.loadText(helpText);
@@ -84,6 +84,11 @@ public class Mines extends TankernnGame {
 		}
 
 		setSettings(DEFAULT_SETTINGS);
+		
+		EventQueue.invokeLater(() -> {
+			editor = new SettingsEditor(this);
+		});
+		
 		startGame();
 	}
 
@@ -178,11 +183,6 @@ public class Mines extends TankernnGame {
 			timeText.setText(format.format(((float) (Sys.getTime() - startTime)) / Sys.getTimerResolution()));
 		else if (Keyboard.isKeyDown(Keyboard.KEY_R))
 			startGame();
-		if (Keyboard.isKeyDown(Keyboard.KEY_E) && (editor == null || !editor.isShowing()))
-			EventQueue.invokeLater(() -> {
-				editor = new SettingsEditor(this);
-			});
-			
 
 		if (hiddenTiles == settings.mines)
 			win();

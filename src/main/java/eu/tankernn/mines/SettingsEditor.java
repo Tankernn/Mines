@@ -19,7 +19,8 @@ public class SettingsEditor extends JFrame {
 	private JPanel contentPane;
 	private int radius = 3, size = radius * 2 + 1;
 	private Mines gameInstance;
-	private JSpinner minesSpinner = new JSpinner(), sizeSpinner = new JSpinner();
+	private JSpinner minesSpinner = new JSpinner(),
+			sizeSpinner = new JSpinner();
 	JCheckBox[][] boxes;
 
 	/**
@@ -60,14 +61,11 @@ public class SettingsEditor extends JFrame {
 
 		JButton save = new JButton("Save");
 		save.addActionListener(e -> {
-			List<Pos> pattern = Mines.allPositions(size, size).filter(p -> boxes[p.x][p.y].isSelected())
-					.collect(Collectors.toList());
+			Pos delta = new Pos(-radius, -radius);
+			List<Pos> pattern = Mines.allPositions(size, size).filter(p -> boxes[p.x][p.y].isSelected()).map(p -> p.add(delta)).collect(Collectors.toList());
 
-			if (gameInstance != null) {
-				gameInstance.setSettings(new Settings(pattern, (int) sizeSpinner.getValue(),
-						(int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
-				dispose();
-			}
+			gameInstance.setSettings(new Settings(pattern, (int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
+
 		});
 
 		contentPane.add(options, BorderLayout.NORTH);

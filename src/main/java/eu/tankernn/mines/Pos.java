@@ -27,4 +27,8 @@ public class Pos {
 	public String toString() {
 		return "(" + x + ", " + y + ")";
 	}
+	
+	public Pos add(Pos other) {
+		return new Pos(this.x + other.x, this.y + other.y);
+	}
 }

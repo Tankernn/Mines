@@ -1,4 +1,5 @@
 # Mines
+[![Build Status](https://tankernn.eu/jenkins/buildStatus/icon?job=Minesweeper)](https://tankernn.eu/jenkins/job/Minesweeper)
 
 A simple Minesweeper clone.
 

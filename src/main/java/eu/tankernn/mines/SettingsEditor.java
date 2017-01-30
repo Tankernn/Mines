@@ -3,6 +3,7 @@ package eu.tankernn.mines;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
@@ -18,7 +19,7 @@ public class SettingsEditor extends JFrame {
 
 	private JPanel contentPane;
 	private int radius = 3, size = radius * 2 + 1;
-	private Mines gameInstance;
+	private Consumer<Settings> settingsConsumer;
 	private JSpinner minesSpinner = new JSpinner(),
 			sizeSpinner = new JSpinner();
 	JCheckBox[][] boxes;
@@ -26,8 +27,8 @@ public class SettingsEditor extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public SettingsEditor(Mines instance) {
-		gameInstance = instance;
+	public SettingsEditor(Settings initialSettings, Consumer<Settings> consumer) {
+		settingsConsumer = consumer;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -55,7 +56,7 @@ public class SettingsEditor extends JFrame {
 			}
 		}
 
-		importSettings(instance.getSettings());
+		importSettings(initialSettings);
 
 		boxes[radius][radius].setEnabled(false);
 
@@ -64,7 +65,7 @@ public class SettingsEditor extends JFrame {
 			Pos delta = new Pos(-radius, -radius);
 			List<Pos> pattern = Mines.allPositions(size, size).filter(p -> boxes[p.x][p.y].isSelected()).map(p -> p.add(delta)).collect(Collectors.toList());
 
-			gameInstance.setSettings(new Settings(pattern, (int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
+			settingsConsumer.accept(new Settings(pattern, (int) sizeSpinner.getValue(), (int) sizeSpinner.getValue(), (int) minesSpinner.getValue()));
 
 		});
 

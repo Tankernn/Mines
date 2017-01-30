@@ -86,7 +86,7 @@ public class Mines extends TankernnGame {
 		setSettings(DEFAULT_SETTINGS);
 		
 		EventQueue.invokeLater(() -> {
-			editor = new SettingsEditor(this);
+			editor = new SettingsEditor(DEFAULT_SETTINGS, this::setSettings);
 		});
 		
 		startGame();
@@ -131,9 +131,9 @@ public class Mines extends TankernnGame {
 
 	public void calculateMinesAround(Tile tile, List<Pos> pattern) {
 		hiddenTiles--;
-
+		
 		List<Tile> testTiles = pattern.stream().map(p -> p.add(tile.pos))
-				.map(p -> tiles.get(p)).filter(t -> t != null).collect(Collectors.toList());
+				.map(tiles::get).filter(t -> t != null).collect(Collectors.toList());
 
 		int minesAround = (int) testTiles.stream().filter(t -> t.isMine).count();
 

@@ -20,7 +20,8 @@ import org.lwjgl.util.vector.Vector2f;
 
 import eu.tankernn.gameEngine.GameLauncher;
 import eu.tankernn.gameEngine.TankernnGame;
-import eu.tankernn.gameEngine.loader.font.FontType;
+import eu.tankernn.gameEngine.loader.font.Font;
+import eu.tankernn.gameEngine.loader.font.FontFamily;
 import eu.tankernn.gameEngine.loader.font.GUIText;
 import eu.tankernn.gameEngine.loader.textures.Texture;
 import eu.tankernn.gameEngine.renderEngine.gui.GuiRenderer;
@@ -73,9 +74,10 @@ public class Mines extends TankernnGame {
 				checked[i] = loader.loadTexture(i + ".png");
 			exploded = loader.loadTexture("exploded.png");
 			flagged = loader.loadTexture("flagged.png");
-			FontType font = new FontType(loader.loadTexture("arial.png"), new InternalFile("arial.fnt"));
-			timeText = new GUIText(format.format(0), 1f, font, new Vector2f(0f, 0f), 100, false);
-			GUIText helpText = new GUIText("Press R to reset board", 1f, font, new Vector2f(0.8f, 0f), 0.15f,
+			FontFamily fontFam = new FontFamily(loader.loadTexture("arial.png"), new InternalFile("arial.fnt"));
+			Font font = new Font(fontFam, 1);
+			timeText = new GUIText(format.format(0), font, new Vector2f(0f, 0f), 100, false);
+			GUIText helpText = new GUIText("Press R to reset board", font, new Vector2f(0.8f, 0f), 0.15f,
 					false);
 			textMaster.loadText(timeText);
 			textMaster.loadText(helpText);

@@ -216,7 +216,7 @@ public class Mines extends TankernnGame {
 			}
 			Vector2f scale = new Vector2f(1f / settings.boardWidth, 1f / settings.boardHeight);
 			toRender.add(new GuiTexture(tex,
-					new Vector2f(2 * scale.x * t.pos.x + scale.x - 1, 2 * scale.y * t.pos.y + scale.y - 1), scale));
+					new Vector2f(2 * scale.x * t.pos.x + scale.x - 1, 2 * scale.y * t.pos.y + scale.y - 1), scale.x));
 
 		}
 

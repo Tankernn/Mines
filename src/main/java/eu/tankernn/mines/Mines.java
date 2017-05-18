@@ -68,13 +68,13 @@ public class Mines extends TankernnGame {
 		renderer = new GuiRenderer(loader);
 
 		try {
-			hidden = loader.loadTexture("hidden.png");
+			hidden = loader.loadTexture(new InternalFile("hidden.png"));
 			checked = new Texture[10];
 			for (int i = 0; i < checked.length; i++)
-				checked[i] = loader.loadTexture(i + ".png");
-			exploded = loader.loadTexture("exploded.png");
-			flagged = loader.loadTexture("flagged.png");
-			FontFamily fontFam = new FontFamily(loader.loadTexture("arial.png"), new InternalFile("arial.fnt"));
+				checked[i] = loader.loadTexture(new InternalFile(i + ".png"));
+			exploded = loader.loadTexture(new InternalFile("exploded.png"));
+			flagged = loader.loadTexture(new InternalFile("flagged.png"));
+			FontFamily fontFam = new FontFamily(loader.loadTextureAtlas(new InternalFile("arial.png")), new InternalFile("arial.fnt"));
 			Font font = new Font(fontFam, 1);
 			timeText = new GUIText(format.format(0), font, new Vector2f(0f, 0f), 100, false);
 			GUIText helpText = new GUIText("Press R to reset board", font, new Vector2f(0.8f, 0f), 0.15f,
